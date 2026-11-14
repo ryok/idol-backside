@@ -1,0 +1,11 @@
+# 生成物（seed とスクリプトで作り直せる）
+ply/
+rec/
+audio/
+*.ply
+*.mov
+*.mp4
+*.wav
+.DS_Store
+__pycache__/
+Backup/
