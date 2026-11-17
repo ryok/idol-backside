@@ -9,3 +9,4 @@ audio/
 .DS_Store
 __pycache__/
 Backup/
+*.toe
