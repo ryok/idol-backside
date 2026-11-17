@@ -46,7 +46,14 @@ cp ../idol-backside/scripts/*.py ..   # スクリプトは idol-sdk の1つ上�
 - `load_cam` の `module.load('<名前>')` で `ply/<名前>.ply` と `ply/<名前>_camera.json` を読む
 - `cam_mode`: 0＝上下軸のまわりを回る（`orbit_deg_per_sec`）、1＝上から下へ回り込む（`sweep_sec`・`sweep_to_deg`）
 - `audio_src`: 0＝ファイル、1＝マイク（`audio_dev` の `device`、既定は macOS の既定入力）。`bass_floor`・`hit_floor` は自動ゲインの下限（直近 8 秒の最大がこれより小さいときはこの値で割る。静かな部屋の小さな音で最大まで動かないようにするため。Shure MV7+ を 30cm 以内で叩いたときの値で `hit_floor` 0.0005 に合わせた）。マイクの値は `mic_log`（Execute DAT）が毎フレーム `parent().fetch('miclog')` に 5 分ぶん残す（storage は tox に保存されるので、書き出す前に `parent().unstore('miclog')` で消す）。TD 起動後に macOS 側でマイクのサンプルレートが変わると、`audio_dev` が `Audio driver not detected` で 0 になる。そのときは TD を再起動する。`bass_gain`・`hit_gain` で強さ、`back_only`=1 で写っていなかった側だけを崩す
-- 既定値: `bass_gain` 0.3（低音の膨らみは全部の点にかかり、正面まで大きくなるので弱める）、`dist` 2.4（狐が画面の約 8 割。2.0 だと端で切れる）
+- 共通: `bass_gain` 0.3（低音の膨らみは全部の点にかかり、正面まで大きくなるので弱める）、`hit_gain` 1.0（2.0 だとボウルでは強い打音で画面いっぱいに散り、形が消える）。`bg` は背景の明るさ（0〜1、1＝白）
+- 物ごとの設定（2026-11-17 に録画で合わせた値。tox はボウルの設定で保存）:
+
+  | 物 | カメラ | `dist` | `bg` |
+  |---|---|---|---|
+  | fig-fox_s1（横から撮影） | `cam_mode` 0（横に回る、毎秒 24 度） | 2.4 | 1（白） |
+  | real-drum_s2（真上から） | `cam_mode` 1（上下に回り込む、`sweep_sec` 20） | 1.8 | 1（白） |
+  | real-bowl_s1（真上から） | `cam_mode` 1（`sweep_sec` 40） | 2.6 | 0.06（銀色の点が白に溶けるので暗くする） |
 - 録画: `rec_ctl`（Text DAT）。`cue(gain)` で `bass_gain` を入れて音を頭出し、`start(path)` で録画開始（カメラの回転角を録画の頭で揃える）、`stop()` で停止。自動ゲインが落ち着くよう、頭出しから 9 秒待って 15 秒録るのが今の手順（`run(..., delayFrames=)` で予約）
 - tox を書き出すときは、`mcp_webserver_base` が中に入っていないこと、storage が空であることを確かめる
 - `.ply` と `td/` のパスは今は `/Users/ryookada/work/idol-eval-local/` の絶対パス
