@@ -52,16 +52,18 @@ cp ../idol-backside/scripts/*.py ..   # スクリプトは idol-sdk の1つ上�
 - `cam_mode`: 0＝上下軸のまわりを回る（`orbit_deg_per_sec`）、1＝上から下へ回り込む（`sweep_sec`・`sweep_to_deg`）
 - `audio_src`: 0＝ファイル、1＝マイク（`audio_dev` の `device`、既定は macOS の既定入力）。`bass_floor`・`hit_floor` は自動ゲインの下限（直近 8 秒の最大がこれより小さいときはこの値で割る。静かな部屋の小さな音で最大まで動かないようにするため。Shure MV7+ を 30cm 以内で叩いたときの値で `hit_floor` 0.0005 に合わせた）。マイクの値は `mic_log`（Execute DAT）が毎フレーム `parent().fetch('miclog')` に 5 分ぶん残す（storage は tox に保存されるので、書き出す前に `parent().unstore('miclog')` で消す）。TD 起動後に macOS 側でマイクのサンプルレートが変わると、`audio_dev` が `Audio driver not detected` で 0 になる。そのときは TD を再起動する。`bass_gain`・`hit_gain` で強さ、`back_only`=1 で写っていなかった側だけを崩す
 - 共通: `bass_gain` 0.3（低音の膨らみは全部の点にかかり、正面まで大きくなるので弱める）、`hit_gain` 1.0（2.0 だとボウルでは強い打音で画面いっぱいに散り、形が消える）。`bg` は背景の明るさ（0〜1、1＝白）
-- 物ごとの設定（2026-11-17 に録画で合わせた値。tox はボウルの設定で保存）:
+- 物ごとの設定（録画で合わせた値。tox はサンセベリアの設定で保存、2026-11-19）:
 
   | 物 | カメラ | `dist` | `bg` |
   |---|---|---|---|
   | fig-fox_s1（横から撮影） | `cam_mode` 0（横に回る、毎秒 24 度） | 2.4 | 1（白） |
   | real-drum_s2（真上から） | `cam_mode` 1（上下に回り込む、`sweep_sec` 20） | 1.8 | 1（白） |
   | real-bowl_s1（真上から） | `cam_mode` 1（`sweep_sec` 40） | 2.6 | 0.06（銀色の点が白に溶けるので暗くする） |
-- 回り込むほど音も崩す: `audio_file` は 4ch（1・2ch 原音、3・4ch 崩した音。`music/make_broken.sh` で作る）。`snd_mix`（Cross CHOP）で混ぜてスピーカー（`audio_out`）と録画（`rec` の音声）に出す。混ぜる量は `load_cam` の `snd_mix()`＝入力の視点からどれだけ裏に回ったか（カメラと入力の向きの内積から 0＝正面・1＝真裏、どちらの `cam_mode` でも同じ）。`snd_start`（0.1、ここまでは原音のまま）・`snd_amt`（1、0 で崩さない）。点を崩す解析（`mono` 以降）は `snd_clean`（原音の 2ch）だけを見る（崩した音を解析に入れると打音の検出と自動ゲインが角度でずれる）
+  | plant-0577_s1（斜め上 44 度から、作品の主役） | `cam_mode` 1（`sweep_sec` 40、曲の頭で `sweep_t0`） | 3.0 | 0.06 |
+  | elephant-0581-big_s3（正面から、`LARGEST=1`） | `cam_mode` 0 | 3.0 | 0.06（TD で 0・90 度を見ただけ、録画は未） |
+- 回り込むほど音も崩す: `audio_file` は 4ch（1・2ch 原音、3・4ch 崩した音。`music/make_broken.sh` で作る）。`snd_mix`（Cross CHOP）で混ぜてスピーカー（`audio_out`）と録画（`rec` の音声）に出す。混ぜる量は `load_cam` の `snd_mix()`＝入力の視点からどれだけ裏に回ったか（カメラと入力の向きの内積から 0＝正面・1＝真裏）を、今のカメラの動きで一番裏に行ったときの値（`back_max()`。`cam_mode` 1 は往復の一番下、0 は真後ろ）で割ったもの。斜めから撮った物は真裏まで回れないので、割り戻して「一番裏＝一番崩れる」にそろえる。`snd_start`（0.1、ここまでは原音のまま）・`snd_amt`（1、0 で崩さない）。点を崩す解析（`mono` 以降）は `snd_clean`（原音の 2ch）だけを見る（崩した音を解析に入れると打音の検出と自動ゲインが角度でずれる）
 - 曲: `music/sketch1.py`（16 小節・96 BPM・40 秒＝`sweep_sec` 40 の 1 往復）。打音の検出は 2.5kHz 以上の立ち上がりなのでハットは間を空けて強さを揃え、低音の膨らみは 150Hz 以下なのでベースは音を切る。`mic_log` は混ぜる量も 6 番目に残す
-- 録画: `rec_ctl`（Text DAT）。`cue(gain)` で `bass_gain` を入れて音を頭出し、`start(path)` で録画開始（カメラの回転角を録画の頭で揃える）、`stop()` で停止。自動ゲインが落ち着くよう、頭出しから 9 秒待って 15 秒録るのが今の手順（`run(..., delayFrames=)` で予約）
+- 録画: `rec_ctl`（Text DAT）。`cue(gain)` で `bass_gain` を入れて音を頭出し、`start(path)` で録画開始（`cam_mode` 0 のときだけ、カメラの回転角を録画の頭で入力の正面に揃える。上下の回り込みで yaw をずらすと、写真の正面からずれた向きで回る）、`stop()` で停止。曲の通しは、`sweep_t0` に今の時刻を入れて頭出しし、すぐ `start` して 124 秒後に `stop` を `run(..., delayFrames=)` で予約する
 - tox を書き出すときは、`mcp_webserver_base` が中に入っていないこと、storage が空であることを確かめる
 - `.ply` と `td/` のパスは今は `/Users/ryookada/work/idol-eval-local/` の絶対パス
 
