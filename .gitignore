@@ -10,3 +10,9 @@ audio/
 __pycache__/
 Backup/
 *.toe
+
+# Ableton Live: セット本体(.als)だけ管理する
+music/*/Backup/
+music/*/Ableton Project Info/
+music/*/Icon?
+*.asd

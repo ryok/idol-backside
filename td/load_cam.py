@@ -1,4 +1,4 @@
-import json, math
+﻿import json, math
 
 def load(name):
     """.ply とその推定カメラ（yaw/pitch）を選ぶ。その他の行（gain など）は残す。"""
@@ -30,3 +30,14 @@ def angles():
 def campos(i):
     y, p = angles(); d = _f('dist')
     return (d * math.cos(p) * math.sin(y), d * math.sin(p), -d * math.cos(p) * math.cos(y))[i]
+
+def backness():
+    """入力の視点からどれだけ裏に回ったか（0＝正面、1＝真裏）。音の崩れに使う"""
+    y, pt = angles(); y0, p0 = _f('yaw'), _f('pitch')
+    d = math.cos(pt)*math.cos(p0)*math.cos(y - y0) + math.sin(pt)*math.sin(p0)
+    return (1 - d) / 2
+
+def snd_mix():
+    """崩れた音の混ぜ具合。snd_start までは原音のまま、そこから真裏で snd_amt"""
+    s = _f('snd_start'); w = (backness() - s) / max(1 - s, 1e-6)
+    return max(0.0, min(1.0, w)) * _f('snd_amt')

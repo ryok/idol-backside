@@ -12,7 +12,8 @@
 | `scripts/` | GPU サーバーで動かす生成・検証スクリプト（Idol SDK の `.venv` で実行） |
 | `idol_pc.tox` | TouchDesigner の部品（点群の描画・音での崩し・カメラ） |
 | `td/` | `idol_pc.tox` の中の GLSL とカメラの Python。TD の DAT がこのファイルと同期している（`syncfile`） |
-| `ply/` `rec/` `audio/` | 生成物・録画・試験音（git 管理外） |
+| `music/` | 曲。`sketch1.py` が ableton-cli で Live にノートを書く、`make_broken.sh` が崩した音と 4ch WAV を作る、`idol_backside Project/idol_backside.als` が Live のセット（Live の `Backup/` などは git 管理外） |
+| `ply/` `rec/` `audio/` | 生成物・録画・曲の書き出し（git 管理外） |
 
 ### scripts/
 
@@ -54,6 +55,8 @@ cp ../idol-backside/scripts/*.py ..   # スクリプトは idol-sdk の1つ上�
   | fig-fox_s1（横から撮影） | `cam_mode` 0（横に回る、毎秒 24 度） | 2.4 | 1（白） |
   | real-drum_s2（真上から） | `cam_mode` 1（上下に回り込む、`sweep_sec` 20） | 1.8 | 1（白） |
   | real-bowl_s1（真上から） | `cam_mode` 1（`sweep_sec` 40） | 2.6 | 0.06（銀色の点が白に溶けるので暗くする） |
+- 回り込むほど音も崩す: `audio_file` は 4ch（1・2ch 原音、3・4ch 崩した音。`music/make_broken.sh` で作る）。`snd_mix`（Cross CHOP）で混ぜてスピーカー（`audio_out`）と録画（`rec` の音声）に出す。混ぜる量は `load_cam` の `snd_mix()`＝入力の視点からどれだけ裏に回ったか（カメラと入力の向きの内積から 0＝正面・1＝真裏、どちらの `cam_mode` でも同じ）。`snd_start`（0.1、ここまでは原音のまま）・`snd_amt`（1、0 で崩さない）。点を崩す解析（`mono` 以降）は `snd_clean`（原音の 2ch）だけを見る（崩した音を解析に入れると打音の検出と自動ゲインが角度でずれる）
+- 曲: `music/sketch1.py`（16 小節・96 BPM・40 秒＝`sweep_sec` 40 の 1 往復）。打音の検出は 2.5kHz 以上の立ち上がりなのでハットは間を空けて強さを揃え、低音の膨らみは 150Hz 以下なのでベースは音を切る。`mic_log` は混ぜる量も 6 番目に残す
 - 録画: `rec_ctl`（Text DAT）。`cue(gain)` で `bass_gain` を入れて音を頭出し、`start(path)` で録画開始（カメラの回転角を録画の頭で揃える）、`stop()` で停止。自動ゲインが落ち着くよう、頭出しから 9 秒待って 15 秒録るのが今の手順（`run(..., delayFrames=)` で予約）
 - tox を書き出すときは、`mcp_webserver_base` が中に入っていないこと、storage が空であることを確かめる
 - `.ply` と `td/` のパスは今は `/Users/ryookada/work/idol-eval-local/` の絶対パス
