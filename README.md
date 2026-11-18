@@ -51,6 +51,7 @@ cp ../idol-backside/scripts/*.py ..   # スクリプトは idol-sdk の1つ上�
 - `load_cam` の `module.load('<名前>')` で `ply/<名前>.ply` と `ply/<名前>_camera.json` を読む
 - `cam_mode`: 0＝上下軸のまわりを回る（`orbit_deg_per_sec`）、1＝上から下へ回り込む（`sweep_sec`・`sweep_to_deg`）
 - `audio_src`: 0＝ファイル、1＝マイク（`audio_dev` の `device`、既定は macOS の既定入力）。`bass_floor`・`hit_floor` は自動ゲインの下限（直近 8 秒の最大がこれより小さいときはこの値で割る。静かな部屋の小さな音で最大まで動かないようにするため。Shure MV7+ を 30cm 以内で叩いたときの値で `hit_floor` 0.0005 に合わせた）。マイクの値は `mic_log`（Execute DAT）が毎フレーム `parent().fetch('miclog')` に 5 分ぶん残す（storage は tox に保存されるので、書き出す前に `parent().unstore('miclog')` で消す）。TD 起動後に macOS 側でマイクのサンプルレートが変わると、`audio_dev` が `Audio driver not detected` で 0 になる。そのときは TD を再起動する。`bass_gain`・`hit_gain` で強さ、`back_only`=1 で写っていなかった側だけを崩す
+- 点の描き方: `select` の `pt_style`（0＝箱のインスタンス〔作品はこれ〕、1＝丸い点、2＝ぼかした点）。1・2 は `mat_splat`（GLSL MAT、`td/splat_vert.glsl`・`td/splat_pixel.glsl`）でカメラに向けた板を描く。`pt_size` は板の大きさの倍率、`pt_sharp` は 2 のぼかしの鋭さ。2 は奥→手前に並べ替えずに半透明を重ねるので、一番裏が透ける（比べた結果は LIFE の記録）
 - 共通: `bass_gain` 0.3（低音の膨らみは全部の点にかかり、正面まで大きくなるので弱める）、`hit_gain` 1.0（2.0 だとボウルでは強い打音で画面いっぱいに散り、形が消える）。`bg` は背景の明るさ（0〜1、1＝白）
 - 物ごとの設定（録画で合わせた値。tox はサンセベリアの設定で保存、2026-11-19）:
 
