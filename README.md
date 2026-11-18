@@ -60,7 +60,7 @@ cp ../idol-backside/scripts/*.py ..   # スクリプトは idol-sdk の1つ上�
   | real-drum_s2（真上から） | `cam_mode` 1（上下に回り込む、`sweep_sec` 20） | 1.8 | 1（白） |
   | real-bowl_s1（真上から） | `cam_mode` 1（`sweep_sec` 40） | 2.6 | 0.06（銀色の点が白に溶けるので暗くする） |
   | plant-0577_s1（斜め上 44 度から、作品の主役） | `cam_mode` 1（`sweep_sec` 40、曲の頭で `sweep_t0`） | 3.0 | 0.06 |
-  | elephant-0581-big_s3（正面から、`LARGEST=1`） | `cam_mode` 0 | 3.0 | 0.06（TD で 0・90 度を見ただけ、録画は未） |
+  | elephant-0581-big_s3（正面から、`LARGEST=1`、横に回す版） | `cam_mode` 0（毎秒 9 度＝40 秒で 1 周、曲の区切りと揃える） | 3.0 | 0.06 |
 - 回り込むほど音も崩す: `audio_file` は 4ch（1・2ch 原音、3・4ch 崩した音。`music/make_broken.sh` で作る）。`snd_mix`（Cross CHOP）で混ぜてスピーカー（`audio_out`）と録画（`rec` の音声）に出す。混ぜる量は `load_cam` の `snd_mix()`＝入力の視点からどれだけ裏に回ったか（カメラと入力の向きの内積から 0＝正面・1＝真裏）を、今のカメラの動きで一番裏に行ったときの値（`back_max()`。`cam_mode` 1 は往復の一番下、0 は真後ろ）で割ったもの。斜めから撮った物は真裏まで回れないので、割り戻して「一番裏＝一番崩れる」にそろえる。`snd_start`（0.1、ここまでは原音のまま）・`snd_amt`（1、0 で崩さない）。点を崩す解析（`mono` 以降）は `snd_clean`（原音の 2ch）だけを見る（崩した音を解析に入れると打音の検出と自動ゲインが角度でずれる）
 - 曲: `music/sketch1.py`（16 小節・96 BPM・40 秒＝`sweep_sec` 40 の 1 往復）。打音の検出は 2.5kHz 以上の立ち上がりなのでハットは間を空けて強さを揃え、低音の膨らみは 150Hz 以下なのでベースは音を切る。`mic_log` は混ぜる量も 6 番目に残す
 - 録画: `rec_ctl`（Text DAT）。`cue(gain)` で `bass_gain` を入れて音を頭出し、`start(path)` で録画開始（`cam_mode` 0 のときだけ、カメラの回転角を録画の頭で入力の正面に揃える。上下の回り込みで yaw をずらすと、写真の正面からずれた向きで回る）、`stop()` で停止。曲の通しは、`sweep_t0` に今の時刻を入れて頭出しし、すぐ `start` して 124 秒後に `stop` を `run(..., delayFrames=)` で予約する
