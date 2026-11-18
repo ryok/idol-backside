@@ -2,7 +2,7 @@
 
 def load(name):
     """.ply とその推定カメラ（yaw/pitch）を選ぶ。その他の行（gain など）は残す。"""
-    d = json.load(open('/Users/ryookada/work/idol-eval-local/ply/%s_camera.json' % name))
+    d = json.load(open(project.folder + '/ply/%s_camera.json' % name))   # project.folder＝.toe のあるフォルダ（リポジトリの直下に置く）
     t = op('select')
     t['name', 1] = name; t['yaw', 1] = d['yaw']; t['pitch', 1] = d['pitch']
     # 上下に回り込む先: 入力の仰角の反対側（真横から撮った写真でも 60 度は下に回る）

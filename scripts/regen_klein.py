@@ -5,7 +5,7 @@
   オフラインで動かす。dev を読もうとすると「見つからない」で止まるので、読んでいないことの裏付けになる
 - seeds.py と同じ条件（既定の optimize=True、mode・seed も同じ）で作り、旧版（dev で作った out/seeds）と比べる
 
-使い方（p-team-17、~/idol-eval/idol-sdk で）:
+使い方（GPU サーバーの ~/idol-eval/idol-sdk で。スクリプトは ~/idol-eval/ に置く）:
   CUDA_VISIBLE_DEVICES=2 .venv/bin/python ../regen_klein.py ../out/seeds_klein ../out/seeds
 """
 import glob, hashlib, json, os, sys, time

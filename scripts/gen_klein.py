@@ -3,7 +3,7 @@
 前処理後の画像（背景を消して切り抜いたもの）も <名前>_prep.png に残し、背景の消え方を確かめられるようにする。
 写真の向きは EXIF を当てて直してから渡す（Idol は EXIF の回転を見ない）。
 
-使い方（p-team-17、~/idol-eval/idol-sdk で）:
+使い方（GPU サーバーの ~/idol-eval/idol-sdk で。スクリプトは ~/idol-eval/ に置く）:
   CUDA_VISIBLE_DEVICES=2 .venv/bin/python ../gen_klein.py <出力フォルダ> <mode> <seed,seed,...> <画像>...
   例: ... ../gen_klein.py ../out/new real 1 ../inputs/plant-a.png ../inputs/elephant-a.png
   LARGEST=1 を付けると、切り抜きの一番大きい塊だけ残す（名前に -big が付く）
