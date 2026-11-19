@@ -28,6 +28,7 @@
 | `render.py` / `render_opaque.py` / `seedsheet.py` | 確認用の簡易スプラット描画（正射影・等方の円。正式なラスタライザではない） |
 | `bench.py` / `phase.py` / `qual.py` / `vaeswap.py` | 検証（速度・VRAM、処理段ごとの時間、見た目、VAE 差し替え） |
 | `regen_klein.py` | 作品用の `.ply` を FLUX.2-dev の VAE を読まずに作り直し、旧版と比べる |
+| `vae_cmp.py` | FLUX.2-dev と FLUX.2-klein-4B の VAE の重みが同じかを値で比べる |
 | `birefnet_cmp.py` | Idol 同梱の BiRefNet の重みが ZhengPeng7/BiRefNet（MIT）と同じかを値で比べる |
 | `gen_klein.py` | 新しい写真から `.ply` を作る（dev の VAE を読まない。EXIF の向きを直す。`LARGEST=1` で切り抜きの一番大きい塊だけ残す） |
 | `newsheet.py` | 写真ごとの比べ表（前処理後の入力・横 4 方向・真下） |
@@ -95,5 +96,5 @@ cp ../idol-backside/scripts/*.py ..   # スクリプトは idol-sdk の1つ上�
 
 - 以前このファイルに書いた「配布時は Built with DINOv3 と表示」は誤り。今の DINOv3 License（GitHub facebookresearch/dinov3 の LICENSE.md、初版 2025-08-14 から）にその条項は無い。あるのは発表時に使用を明記する条項
 - 作品用の `.ply`（ドラム・ボウルの seed 1〜4）は `scripts/regen_klein.py` で、FLUX.2-dev の VAE を一度も読まずに作り直した。dev を含まない Hugging Face のキャッシュをオフラインで使い、VAE は klein-4B を読んだことをログで確認。8 個とも dev で作った旧版とバイト単位で一致した（`optimize` 既定のまま）ので、今の `ply/` はそのまま使える
-- 残る判断: Idol の重み自体が dev の VAE の特徴で学習されている点がライセンス上どう扱われるかは、ここでは判断していない
+- Idol の重みは dev の VAE の特徴で学習されている。ただし dev と klein-4B の VAE は同じ重みだった。`scripts/vae_cmp.py` で比べると、dev 版（fp32）を bf16 にすると klein 版（bf16）と 251 テンソルすべてが一致した（2026-11-19）。学習に使われた特徴は、Apache 2.0 で公開されている VAE の特徴と区別できない。この作品は収益化しない（2026-11-19 に決定）ので、FLUX [dev] Non-Commercial License を最も厳しく読んでも非商用の範囲（1c）に入る
 - なお idol-sdk の今の README には、`IdolPipeline.from_pretrained(..., image_encoders={"flux2_vae": ".../FLUX.2-klein-4B"})` で VAE を差し替える方法が載っている（検証した commit 4702a7f には無い）
