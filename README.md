@@ -7,6 +7,9 @@
 
 問い: **見ていない側を、AI は何で埋めるのか**
 
+作品と制作の記録（note）: https://note.com/ryok/n/nf50f6569aed0
+動画（X）: https://x.com/riokadamusic/status/2124225590115127636
+
 ## 構成
 
 | パス | 中身 |
